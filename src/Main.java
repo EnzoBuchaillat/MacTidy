@@ -21,24 +21,50 @@ public class Main {
         // Une boucle pour que l'utilisateur entre un targetDirectory valide
         do {
             System.out.print("Vous êtes ici : " + userHome + "\nOù voulez vous allez ?\n: ");
-            String inputPath = scanner.nextLine(); // Stock la suite du targetDirectory de l'utilisateur
-            targetDirectory = Path.of(userHome, inputPath); // Créer le targetDirectory complet avec la base du targetDirectory et la suite de l'utilisateur
-            isDirectory = Files.isDirectory(targetDirectory); // Met isDirectory à jour
+            String inputPath = scanner.nextLine(); // Stock la suite du chemin de l'utilisateur
+            targetDirectory = Path.of(userHome, inputPath); // Créer le chemin complet avec la base du chemin et la suite de l'utilisateur
+            isDirectory = Files.isDirectory(targetDirectory); // Met isDirectory à jour pour savoir si c'est un dossier ou non
             if(!isDirectory){
                 if(!Files.exists(targetDirectory)){
-                    System.out.println("ERREUR : Le chemin n'existe pas\n"); // Affiche si le targetDirectory n'existe pas
+                    System.out.println("ERREUR : Le chemin n'existe pas\n"); // Affiche si le chemin n'existe pas
                 } else {
-                    System.out.println("ERREUR : Le chemin n'est pas un dossier\n"); // Affiche si le targetDirectory existe mais n'est pas un dossier
+                    System.out.println("ERREUR : Le chemin n'est pas un dossier\n"); // Affiche si le chemin existe mais n'est pas un dossier
                 }
             }
         } while (!isDirectory);
 
+        long minSizeMb = -1;
 
         System.out.print("Taille minimum des fichiers à cibler (en Mo) : "); // Demande la taille minimum des fichiers à cibler en Mo
-        long minSizeMb = scanner.nextLong(); // Stock la taille minimum choisi
+
+        // Boucle pour vérifier que la valeur taper par l'utilisateur est bien un nombre égal ou supérieur à 0
+        while(minSizeMb < 0){
+            // Vérifie que la valeur de l'utilisateur est bien un chiffre
+            while(!scanner.hasNextLong()){
+                scanner.next();
+                System.out.print("Entrez une valeur valide : ");
+            }
+            minSizeMb = scanner.nextLong();
+            if(minSizeMb < 0){
+                System.out.print("Entrez un nombre positif : ");
+            }
+        }
+
+        long minInactiveDays = -1;
 
         System.out.print("Depuis combien de jours minimum le fichier doit-il être inactif ? : "); // Demande combien de jours minimum le fichier doit-il être inactif
-        long minInactiveDays = scanner.nextLong(); // Stock le nombre de jours d'inactivité choisi
+
+        // Boucle qui vérifie que la valeur taper par l'utilisateur soit bien un nombre égal à 0 ou positif
+        while(minInactiveDays < 0){
+            while(!scanner.hasNextLong()){
+                scanner.next();
+                System.out.print("Entrez une valeur valide : ");
+            }
+            minInactiveDays = scanner.nextLong();
+            if(minInactiveDays < 0){
+                System.out.print("Entrez un nombre positif : ");
+            }
+        }
 
         /* Créer un nouveau flux qui va servir de "tapis roulant" pour
            faire défiler les élements en les enlevants de la mémoire à chaque fois.*/
