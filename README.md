@@ -28,6 +28,7 @@ Prérequis : **Java 21**.
 
 ```bash
 java -cp out Main
+javac -d out src/Main.java
 ```
 
 ## 🗺️ Feuille de route
