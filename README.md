@@ -2,7 +2,7 @@
 
 Utilitaire en ligne de commande pour macOS, écrit en Java (`java.nio`), qui repère les fichiers volumineux et inutilisés depuis longtemps dans un dossier.
 
-> Projet d'apprentissage en cours de développement (BUT Informatique).
+> Projet personnel en cours de développement, pour apprendre la gestion de fichiers en Java.
 
 ## ✅ Fonctionnalités
 
