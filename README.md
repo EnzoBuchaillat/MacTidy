@@ -27,8 +27,8 @@ Prérequis : **Java 21**.
 - **En ligne de commande**, depuis la racine du projet :
 
 ```bash
-java -cp out Main
 javac -d out src/Main.java
+java -cp out Main
 ```
 
 ## 🗺️ Feuille de route
