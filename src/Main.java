@@ -10,6 +10,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
+        final long BYTES_PER_MB = 1024 * 1024; // Le nombre d'octets dans un Mo
+
         Scanner scanner = new Scanner(System.in); // On créer un scanner pour lire les entrées utilisateur
 
         String userHome = System.getProperty("user.home"); // Créer la base du targetDirectory jusqu'à l'utilisateur
@@ -50,6 +52,8 @@ public class Main {
             }
         }
 
+        long minSizeBytes = minSizeMb * BYTES_PER_MB; // On convertit la valeur de l'utilisateur (Mo) en Octets pour faire la comparaison
+
         long minInactiveDays = -1;
 
         System.out.print("Depuis combien de jours minimum le fichier doit-il être inactif ? : "); // Demande combien de jours minimum le fichier doit-il être inactif
@@ -77,13 +81,13 @@ public class Main {
                 if(Files.isRegularFile(entry)){
 
                     long sizeByte = Files.size(entry); // Stock la taille du fichier en Octet
-                    long sizeMb = sizeByte / 1048576; // Stock la taille du fichier en Mo
+                    double sizeMb = (double)sizeByte / BYTES_PER_MB;// Stock la taille du fichier en Mo
                     FileTime lastModifiedTime = Files.getLastModifiedTime(entry); // Récupère et stock la dernière date de modification du fichier
                     Instant today = Instant.now(); // Récupère et stock la date d'aujourd'hui
                     long modifiedDays = ChronoUnit.DAYS.between(lastModifiedTime.toInstant(), today);  // Récupère et stock la dernière modif en jour, grâce à chronoUnit.
                     // Filtre l'affichage sur la taille et le nombre de jours choisi
-                    if(sizeMb > minSizeMb && modifiedDays > minInactiveDays){
-                        System.out.println(entry + "\n taille : " + sizeMb + " Mo" + "\n Dernière modifications : " + modifiedDays + " Jours"); /* affiche le targetDirectory complet de chaque fichier avec sa taille en Mo */
+                    if(sizeByte > minSizeBytes && modifiedDays > minInactiveDays){
+                        System.out.printf("%s \n taille : %.2f Mo\n Dernière modifications : %d Jours\n", entry, sizeMb, modifiedDays); /* affiche le targetDirectory complet de chaque fichier avec sa taille en Mo */
                     }
                 }
             }
