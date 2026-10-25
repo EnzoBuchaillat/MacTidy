@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -70,6 +70,9 @@ public class Main {
             }
         }
 
+        // Créer une hashmap où l'on pourra mettre le chemin avec sa taille.
+        Map<Path, Double> listOfPath = new HashMap<>();
+
         /* Créer un nouveau flux qui va servir de "tapis roulant" pour
            faire défiler les élements en les enlevants de la mémoire à chaque fois.*/
         try(DirectoryStream<Path> stream = Files.newDirectoryStream(targetDirectory)){
@@ -85,12 +88,21 @@ public class Main {
                     FileTime lastModifiedTime = Files.getLastModifiedTime(entry); // Récupère et stock la dernière date de modification du fichier
                     Instant today = Instant.now(); // Récupère et stock la date d'aujourd'hui
                     long modifiedDays = ChronoUnit.DAYS.between(lastModifiedTime.toInstant(), today);  // Récupère et stock la dernière modif en jour, grâce à chronoUnit.
+
                     // Filtre l'affichage sur la taille et le nombre de jours choisi
                     if(sizeByte > minSizeBytes && modifiedDays > minInactiveDays){
-                        System.out.printf("%s \n taille : %.2f Mo\n Dernière modifications : %d Jours\n", entry, sizeMb, modifiedDays); /* affiche le targetDirectory complet de chaque fichier avec sa taille en Mo */
+                        listOfPath.put(entry, sizeMb); // Ajoute au tableau le nom des fichiers avec leur taille chacun.
                     }
                 }
             }
+            System.out.println("Liste des fichiers de plus de " + minInactiveDays + (minInactiveDays > 1 ? " Jours : " : " Jour : "));
+
+            for(Map.Entry<Path, Double> entry : listOfPath.entrySet()){
+                Path path = entry.getKey();
+                Double sizeMb = entry.getValue();
+                System.out.printf("Nom : "+ path + "\nTaille : "+ sizeMb + " Mb\n");
+            }
+            //System.out.println(listOfPath);
         }
 
         /* Gère les exceptions possible en affichant l'historique détaillé et le
