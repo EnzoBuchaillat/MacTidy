@@ -70,8 +70,9 @@ public class Main {
             }
         }
 
-        // Créer une hashmap où l'on pourra mettre le chemin avec sa taille.
-        Map<Path, Double> listOfPath = new HashMap<>();
+        // On créer une liste qui stokera les fichiers scanné
+        List<ScannedFile> matchingFiles = new ArrayList<>();
+
 
         /* Créer un nouveau flux qui va servir de "tapis roulant" pour
            faire défiler les élements en les enlevants de la mémoire à chaque fois.*/
@@ -84,25 +85,22 @@ public class Main {
                 if(Files.isRegularFile(entry)){
 
                     long sizeByte = Files.size(entry); // Stock la taille du fichier en Octet
-                    double sizeMb = (double)sizeByte / BYTES_PER_MB;// Stock la taille du fichier en Mo
                     FileTime lastModifiedTime = Files.getLastModifiedTime(entry); // Récupère et stock la dernière date de modification du fichier
                     Instant today = Instant.now(); // Récupère et stock la date d'aujourd'hui
                     long modifiedDays = ChronoUnit.DAYS.between(lastModifiedTime.toInstant(), today);  // Récupère et stock la dernière modif en jour, grâce à chronoUnit.
 
                     // Filtre l'affichage sur la taille et le nombre de jours choisi
                     if(sizeByte > minSizeBytes && modifiedDays > minInactiveDays){
-                        listOfPath.put(entry, sizeMb); // Ajoute au tableau le nom des fichiers avec leur taille chacun.
+                        matchingFiles.add(new ScannedFile(entry, sizeByte, modifiedDays));
                     }
                 }
             }
             System.out.println("Liste des fichiers de plus de " + minInactiveDays + (minInactiveDays > 1 ? " Jours : " : " Jour : "));
 
-            for(Map.Entry<Path, Double> entry : listOfPath.entrySet()){
-                Path path = entry.getKey();
-                Double sizeMb = entry.getValue();
-                System.out.printf("Nom : "+ path + "\nTaille : "+ sizeMb + " Mb\n");
+            for(ScannedFile file : matchingFiles){
+                double sizeMb = (double)file.sizeBytes() / BYTES_PER_MB;
+                System.out.printf("Nom : %s \nTaille : %.2f Mo\nDernière modification : %d %s%n", file.path(), sizeMb, file.inactiveDays(), file.inactiveDays() > 1 ? "jours" : "jour");
             }
-            //System.out.println(listOfPath);
         }
 
         /* Gère les exceptions possible en affichant l'historique détaillé et le
