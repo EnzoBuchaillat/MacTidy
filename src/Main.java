@@ -3,10 +3,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
-import java.sql.SQLOutput;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.awt.Desktop;
 
 public class Main {
     public static void main(String[] args) {
@@ -118,7 +118,26 @@ public class Main {
                 }
 
                 if(answer.equalsIgnoreCase("o")){
-                    System.out.println("Mise à la corbeille...");
+                    int trashedCount = 0;
+                    // Si l'ordinateur à un bureau
+                    if(Desktop.isDesktopSupported()){
+                        Desktop desktop = Desktop.getDesktop();
+                        // Si on peut accéder à la corbeille
+                        if(desktop.isSupported(Desktop.Action.MOVE_TO_TRASH)) {
+                            for (ScannedFile scannedFile : matchingFiles) {
+                                if (desktop.moveToTrash(scannedFile.path().toFile())) {
+                                    trashedCount++;
+                                } else {
+                                    System.out.printf("Erreur: le fichier %s n'a pas pu être supprimer !%n", scannedFile.path());
+                                }
+                            }
+                            System.out.printf("%d %s !%n", trashedCount, (trashedCount > 1 ? "fichiers ont bien été mis à la corbeille" : "fichier à bien été mis à la corbeille"));
+                        } else {
+                            System.out.println("Impossible d'accéder à la corbeille de votre ordinateur !");
+                        }
+                    } else {
+                        System.out.println("Votre ordinateur n'a pas de bureau !");
+                    }
                 }
                 else {
                     System.out.println("Aucun fichier n'a été touché !");
