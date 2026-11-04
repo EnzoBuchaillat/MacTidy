@@ -3,6 +3,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
+import java.sql.SQLOutput;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -95,12 +96,24 @@ public class Main {
                     }
                 }
             }
-            System.out.println("Liste des fichiers de plus de " + minInactiveDays + (minInactiveDays > 1 ? " Jours : " : " Jour : "));
+            if(!matchingFiles.isEmpty()){
+                System.out.println("Liste des fichiers de plus de " + minInactiveDays + (minInactiveDays > 1 ? " Jours : " : " Jour : "));
 
-            for(ScannedFile file : matchingFiles){
-                double sizeMb = (double)file.sizeBytes() / BYTES_PER_MB;
-                System.out.printf("Nom : %s \nTaille : %.2f Mo\nDernière modification : %d %s%n", file.path(), sizeMb, file.inactiveDays(), file.inactiveDays() > 1 ? "jours" : "jour");
+                long totalSizeBytes = 0;
+                for(ScannedFile file : matchingFiles){
+                    double sizeMb = (double)file.sizeBytes() / BYTES_PER_MB;
+                    totalSizeBytes += file.sizeBytes();
+                    System.out.printf("Nom : %s \nTaille : %.2f Mo\nDernière modification : %d %s%n", file.path(), sizeMb, file.inactiveDays(), file.inactiveDays() > 1 ? "jours" : "jour");
+                }
+
+                double totalSizeMb = (double)totalSizeBytes / BYTES_PER_MB;
+
+                System.out.printf("%d %s %.2f Mo au total%n", matchingFiles.size(), (matchingFiles.size() > 1 ? "fichiers trouvés," : "fichier trouvé,"), totalSizeMb);
             }
+            else {
+                System.out.printf("Aucun fichier trouvé !%n");
+            }
+
         }
 
         /* Gère les exceptions possible en affichant l'historique détaillé et le
