@@ -36,7 +36,29 @@ public class Main {
             }
         } while (!isDirectory);
 
-        findInactiveFiles(targetDirectory, scanner);
+        int choice = 0;
+        while(choice != 1 && choice != 2){
+            System.out.println("Que voulez vous faire : ");
+            System.out.printf("1. Fichiers volumineux et inactifs%n2. Doublons%n: ");
+            while(!scanner.hasNextInt()){
+                scanner.next();
+                System.out.print("Entrez une valeur valide !\n");
+                System.out.printf("1. Fichiers volumineux et inactifs%n2. Doublons%n: ");
+            }
+            choice = scanner.nextInt();
+            if(choice != 1 && choice != 2){
+                System.out.print("Tapez 1 ou 2\n");
+            }
+        }
+
+        switch (choice){
+            case 1:
+                findInactiveFiles(targetDirectory, scanner);
+                break;
+            case 2:
+                System.out.println("Bientôt disponible...");
+                break;
+        }
     }
 
     public static void findInactiveFiles(Path targetDirectory, Scanner scanner){
