@@ -109,6 +109,21 @@ public class Main {
                 double totalSizeMb = (double)totalSizeBytes / BYTES_PER_MB;
 
                 System.out.printf("%d %s %.2f Mo au total%n", matchingFiles.size(), (matchingFiles.size() > 1 ? "fichiers trouvés," : "fichier trouvé,"), totalSizeMb);
+
+
+                String answer = "";
+                while(!answer.equalsIgnoreCase("o") && !answer.equalsIgnoreCase("n")) {
+                    System.out.printf("Mettre ces fichiers à la corbeille ? (o/N) : ");
+                    answer = scanner.next();
+                }
+
+                if(answer.equalsIgnoreCase("o")){
+                    System.out.println("Mise à la corbeille...");
+                }
+                else {
+                    System.out.println("Aucun fichier n'a été touché !");
+                }
+
             }
             else {
                 System.out.printf("Aucun fichier trouvé !%n");
