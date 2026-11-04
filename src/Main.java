@@ -5,7 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Scanner;
+import java.util.*;
+import java.awt.Desktop;
 
 public class Main {
     public static void main(String[] args) {
@@ -70,6 +71,10 @@ public class Main {
             }
         }
 
+        // On créer une liste qui stokera les fichiers scanné
+        List<ScannedFile> matchingFiles = new ArrayList<>();
+
+
         /* Créer un nouveau flux qui va servir de "tapis roulant" pour
            faire défiler les élements en les enlevants de la mémoire à chaque fois.*/
         try(DirectoryStream<Path> stream = Files.newDirectoryStream(targetDirectory)){
@@ -81,16 +86,68 @@ public class Main {
                 if(Files.isRegularFile(entry)){
 
                     long sizeByte = Files.size(entry); // Stock la taille du fichier en Octet
-                    double sizeMb = (double)sizeByte / BYTES_PER_MB;// Stock la taille du fichier en Mo
                     FileTime lastModifiedTime = Files.getLastModifiedTime(entry); // Récupère et stock la dernière date de modification du fichier
                     Instant today = Instant.now(); // Récupère et stock la date d'aujourd'hui
                     long modifiedDays = ChronoUnit.DAYS.between(lastModifiedTime.toInstant(), today);  // Récupère et stock la dernière modif en jour, grâce à chronoUnit.
+
                     // Filtre l'affichage sur la taille et le nombre de jours choisi
                     if(sizeByte > minSizeBytes && modifiedDays > minInactiveDays){
-                        System.out.printf("%s \n taille : %.2f Mo\n Dernière modifications : %d Jours\n", entry, sizeMb, modifiedDays); /* affiche le targetDirectory complet de chaque fichier avec sa taille en Mo */
+                        matchingFiles.add(new ScannedFile(entry, sizeByte, modifiedDays));
                     }
                 }
             }
+            if(!matchingFiles.isEmpty()){
+                System.out.println("Liste des fichiers de plus de " + minInactiveDays + (minInactiveDays > 1 ? " Jours : " : " Jour : "));
+
+                long totalSizeBytes = 0;
+                for(ScannedFile file : matchingFiles){
+                    double sizeMb = (double)file.sizeBytes() / BYTES_PER_MB;
+                    totalSizeBytes += file.sizeBytes();
+                    System.out.printf("Nom : %s \nTaille : %.2f Mo\nDernière modification : %d %s%n", file.path(), sizeMb, file.inactiveDays(), file.inactiveDays() > 1 ? "jours" : "jour");
+                }
+
+                double totalSizeMb = (double)totalSizeBytes / BYTES_PER_MB;
+
+                System.out.printf("%d %s %.2f Mo au total%n", matchingFiles.size(), (matchingFiles.size() > 1 ? "fichiers trouvés," : "fichier trouvé,"), totalSizeMb);
+
+
+                String answer = "";
+                while(!answer.equalsIgnoreCase("o") && !answer.equalsIgnoreCase("n")) {
+                    System.out.printf("Mettre ces fichiers à la corbeille ? (o/n) : ");
+                    answer = scanner.next();
+                }
+
+                if(answer.equalsIgnoreCase("o")){
+                    int trashedCount = 0;
+                    // Si l'ordinateur à un bureau
+                    if(Desktop.isDesktopSupported()){
+                        Desktop desktop = Desktop.getDesktop();
+                        // Si on peut accéder à la corbeille
+                        if(desktop.isSupported(Desktop.Action.MOVE_TO_TRASH)) {
+                            for (ScannedFile scannedFile : matchingFiles) {
+                                if (desktop.moveToTrash(scannedFile.path().toFile())) {
+                                    trashedCount++;
+                                } else {
+                                    System.out.printf("Erreur: le fichier %s n'a pas pu être déplacé !%n", scannedFile.path());
+                                }
+                            }
+                            System.out.printf("%d %s !%n", trashedCount, (trashedCount > 1 ? "fichiers ont bien été mis à la corbeille" : "fichier a bien été mis à la corbeille"));
+                        } else {
+                            System.out.println("Impossible d'accéder à la corbeille de votre ordinateur !");
+                        }
+                    } else {
+                        System.out.println("Votre ordinateur n'a pas de bureau !");
+                    }
+                }
+                else {
+                    System.out.println("Aucun fichier n'a été touché !");
+                }
+
+            }
+            else {
+                System.out.printf("Aucun fichier trouvé !%n");
+            }
+
         }
 
         /* Gère les exceptions possible en affichant l'historique détaillé et le
