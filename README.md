@@ -1,22 +1,25 @@
 # 🧹 MacTidy
 
-Utilitaire en ligne de commande pour macOS, écrit en Java (`java.nio`), qui repère les fichiers volumineux et inutilisés depuis longtemps dans un dossier.
+Utilitaire en ligne de commande pour macOS, écrit en Java (`java.nio`), qui repère les fichiers volumineux et inutilisés depuis longtemps dans un dossier, puis propose de les mettre à la corbeille.
 
 > Projet personnel en cours de développement, pour apprendre la gestion de fichiers en Java.
 
 ## ✅ Fonctionnalités
 
 - **Choix du dossier** : l'utilisateur saisit un chemin à partir de son dossier personnel (par exemple `Downloads`). Le programme redemande tant que le chemin n'existe pas ou n'est pas un dossier, avec un message d'erreur différent pour chaque cas.
-- **Filtre par taille** : seuls les fichiers dont la taille est strictement supérieure au seuil saisi (en Mo) sont affichés.
-- **Filtre par inactivité** : seuls les fichiers non modifiés depuis strictement plus de N jours sont affichés (d'après la date de dernière modification).
+- **Filtre par taille** : seuls les fichiers dont la taille est strictement supérieure au seuil saisi (en Mo) sont retenus.
+- **Filtre par inactivité** : seuls les fichiers non modifiés depuis strictement plus de N jours sont retenus (d'après la date de dernière modification).
 - **Saisies sécurisées** : si l'utilisateur tape autre chose qu'un nombre positif, le programme affiche une erreur et redemande au lieu de planter.
-- **Affichage** : pour chaque fichier trouvé, le chemin complet, la taille en Mo (2 décimales) et le nombre de jours depuis la dernière modification.
+- **Aperçu avant action** : pour chaque fichier trouvé, le chemin complet, la taille en Mo (2 décimales) et le nombre de jours depuis la dernière modification, puis un résumé avec le nombre de fichiers et la taille totale.
+- **Confirmation** : le programme demande `o` ou `n` avant de toucher à quoi que ce soit, et redemande tant que la réponse n'est pas valide. Avec `n`, aucun fichier n'est modifié.
+- **Mise à la corbeille** : avec `o`, les fichiers trouvés sont déplacés dans la corbeille de macOS (et non supprimés définitivement), donc récupérables. Le programme affiche le nombre de fichiers déplacés et signale ceux qui n'ont pas pu l'être.
 
 ## ⚠️ Limites actuelles
 
-- **Lecture seule** : MacTidy ne supprime ni ne déplace aucun fichier, il se contente de les lister.
+- **Tout ou rien** : la confirmation s'applique à tous les fichiers trouvés, on ne peut pas en choisir certains seulement.
 - **Pas de sous-dossiers** : seuls les fichiers placés directement dans le dossier choisi sont analysés.
 - **Dossier personnel uniquement** : le chemin saisi est toujours relatif au dossier personnel de l'utilisateur.
+- **Arrêt en cas d'erreur de lecture** : si un fichier ou dossier ne peut pas être lu pendant l'analyse, le scan s'arrête.
 - **Unité des tailles** : 1 Mo = 1 024 × 1 024 octets. Le Finder de macOS compte en base 10 (1 Mo = 1 000 000 octets), donc les tailles peuvent légèrement différer.
 
 ## 🚀 Lancer le projet
@@ -27,17 +30,17 @@ Prérequis : **Java 21**.
 - **En ligne de commande**, depuis la racine du projet :
 
 ```bash
-javac -d out src/Main.java
+javac -d out src/*.java
 java -cp out Main
 ```
+
+> 💡 Pour essayer sans risque, créez un dossier de test avec de faux fichiers et vieillissez-les avec `touch -t 202501010000 fichier.txt`.
 
 ## 🗺️ Feuille de route
 
 Fonctionnalités **prévues**, pas encore disponibles :
 
 - [ ] Recherche de doublons (comparaison par taille, puis par hash)
-- [ ] Mise à la corbeille au lieu d'une suppression définitive
-- [ ] Mode dry-run (simulation sans rien modifier)
 - [ ] Automatisation avec `launchd`
 
 ## 🌿 Organisation Git
