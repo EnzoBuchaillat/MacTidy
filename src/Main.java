@@ -113,7 +113,7 @@ public class Main {
 
                 String answer = "";
                 while(!answer.equalsIgnoreCase("o") && !answer.equalsIgnoreCase("n")) {
-                    System.out.printf("Mettre ces fichiers à la corbeille ? (o/N) : ");
+                    System.out.printf("Mettre ces fichiers à la corbeille ? (o/n) : ");
                     answer = scanner.next();
                 }
 
@@ -128,10 +128,10 @@ public class Main {
                                 if (desktop.moveToTrash(scannedFile.path().toFile())) {
                                     trashedCount++;
                                 } else {
-                                    System.out.printf("Erreur: le fichier %s n'a pas pu être supprimer !%n", scannedFile.path());
+                                    System.out.printf("Erreur: le fichier %s n'a pas pu être déplacé !%n", scannedFile.path());
                                 }
                             }
-                            System.out.printf("%d %s !%n", trashedCount, (trashedCount > 1 ? "fichiers ont bien été mis à la corbeille" : "fichier à bien été mis à la corbeille"));
+                            System.out.printf("%d %s !%n", trashedCount, (trashedCount > 1 ? "fichiers ont bien été mis à la corbeille" : "fichier a bien été mis à la corbeille"));
                         } else {
                             System.out.println("Impossible d'accéder à la corbeille de votre ordinateur !");
                         }
