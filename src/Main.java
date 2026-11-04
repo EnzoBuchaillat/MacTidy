@@ -9,9 +9,9 @@ import java.util.*;
 import java.awt.Desktop;
 
 public class Main {
-    public static void main(String[] args) {
+    private static final long BYTES_PER_MB = 1024 * 1024; // Le nombre d'octets dans un Mo
 
-        final long BYTES_PER_MB = 1024 * 1024; // Le nombre d'octets dans un Mo
+    public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in); // On créer un scanner pour lire les entrées utilisateur
 
@@ -36,8 +36,12 @@ public class Main {
             }
         } while (!isDirectory);
 
-        long minSizeMb = -1;
+        findInactiveFiles(targetDirectory, scanner);
+    }
 
+    public static void findInactiveFiles(Path targetDirectory, Scanner scanner){
+
+        long minSizeMb = -1;
         System.out.print("Taille minimum des fichiers à cibler (en Mo) : "); // Demande la taille minimum des fichiers à cibler en Mo
 
         // Boucle pour vérifier que la valeur taper par l'utilisateur est bien un nombre égal ou supérieur à 0
